@@ -1,0 +1,8 @@
+Check 100 tweets out of a hundred, instead of only a few | DONE
+Improve following | WORK
+Be able to join discords servers | WORK
+Improve avoidance detection | WORK
+Fix bugs fx, 'retweeted_status' | WORK
+Be able to generate new keys when app gets limited | WORK
+Be able to comment what the tweet says | WORK
+Make sure the tweet isn't too old | WORK
