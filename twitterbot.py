@@ -4,7 +4,6 @@ import logging
 import json
 import time
 import random
-import requests
 import os
 #from our keys module (keys.py), import the keys dictionary
 import config
