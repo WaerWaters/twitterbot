@@ -14,10 +14,10 @@ If app auth, Allowed to search 450 times every 15 min | 450 / 15-min
 
 # Twitter API credentials. If you need any help have a look at README.md
 twitter_credentials = {
-    "consumer_key": '',
-    "consumer_secret": '',
-    "access_token": '',
-    "access_secret": '',
+    "consumer_key": 'bRZzibkI1OVNFm983OAnNadwZ',
+    "consumer_secret": 'nyxO0PVo05xGdEgyPbT3c4bi4dPNhRsw8ayP6Fj3tVQMrro0JF',
+    "access_token": '1424776752237273097-eHIcYzVcllTbJSYYOeXoteR0GhQ6TI',
+    "access_secret": 'YmteUMKXgyCKwzzT06nnPDIjMq2XuP32S3vRysKoELTaM',
 }
 # DON'T WRITE ANYTHING IN CAPS, AS THE BOT AUTOMATICALLY FLATTERS ALL INPUT TEXTS. THUS ANY WORD WITH CAPS WON'T BE RECOGNIZED
 # Tags that Twitter will use to look up our tweets. Really important as all the script will be based on them
@@ -47,14 +47,12 @@ message_text = ["let's get this win", "let's win", "giveaway"]
 # Variables related to avoiding users don't need to have a value
 banned_users = []
 # Same but but in this case applied to the author's name
-banned_name_keywords = ["bot", "spotting", "spot", "spotter"]
+banned_name_keywords = ["bot", "spotting", "spot", "spotter", "MegaGiveaways01"]
 # Search_rate means how long it'll have to wait to loop again after checking all tweets
 search_rate = 2
 # How long to wait to pass to next tweet + follow_rate or dm_rate if it has to follow or dm someone
-retweet_rate = 36
-# How long to wait after messaging someone. Just the diff between its value and retweet_rate's is added
-msg_rate = 30
+retweet_rate = 20
 # How long to wait after following someone. 1st time the diff is added, afterwards the entire rate is added to the sleep
-follow_rate = 30
+follow_rate = 10
 # Enable printing in colors
 print_in_color = True

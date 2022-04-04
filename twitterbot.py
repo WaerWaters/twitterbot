@@ -4,7 +4,17 @@ import logging
 import json
 import time
 import random
+from tkinter import *
+from xml.dom.expatbuilder import FragmentBuilderNS
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
 import os
+os.system('clear')
 #from our keys module (keys.py), import the keys dictionary
 import config
 
@@ -26,19 +36,27 @@ sys.stdout = Unbuffered(sys.stdout)
 
 # Output text color
 class colors:
-    HEADER = '\033[95m' if config.print_in_color else ""
-    OKBLUE = '\033[94m' if config.print_in_color else ""
-    OKGREEN = '\033[92m' if config.print_in_color else ""
-    WARNING = '\033[93m' if config.print_in_color else ""
-    FAIL = '\033[91m' if config.print_in_color else ""
-    ENDC = '\033[0m' if config.print_in_color else ""
-    BOLD = '\033[1m' if config.print_in_color else ""
-    UNDERLINE = '\033[4m' if config.print_in_color else ""
+	HEADER = '\033[95m' if config.print_in_color else ""
+	OKBLUE = '\033[94m' if config.print_in_color else ""
+	OKGREEN = '\033[92m' if config.print_in_color else ""
+	WARNING = '\033[93m' if config.print_in_color else ""
+	FAIL = '\033[91m' if config.print_in_color else ""
+	ENDC = '\033[0m' if config.print_in_color else ""
+	BOLD = '\033[1m' if config.print_in_color else ""
+	UNDERLINE = '\033[4m' if config.print_in_color else ""
+	OKMAGENTA = '\033[95m' if config.print_in_color else ""
+	OKCYAN = '\033[96m' if config.print_in_color else ""
 
 # Authentication 
 auth = tweepy.OAuthHandler(config.twitter_credentials["consumer_key"], config.twitter_credentials["consumer_secret"])
 auth.set_access_token(config.twitter_credentials["access_token"], config.twitter_credentials["access_secret"])
 api = tweepy.API(auth)
+
+# GUI
+root = Tk()
+root.title('CNFT trader 1.0.0')
+root.geometry("400x200")
+
 
 screen_name = api.verify_credentials().screen_name
 
@@ -62,6 +80,16 @@ while len(friends) is not api.get_user(screen_name=screen_name).friends_count:
 		time.sleep(600)
 
 def check():
+	# Start selenium drivers
+	s = Service("C:/CNFT Sniper Bot/lib/chromedriver.exe")
+	options = webdriver.ChromeOptions() 
+	options.add_argument("--user-data-dir=C:/Users/danie/AppData/Local/Google/Chrome/User Data/Profile 1")
+	options.add_experimental_option("detach", True)
+
+	# Tweets' the bot has joined and checked
+	joined = 0
+	checked = 0
+
 	print(colors.OKGREEN + "Started Analyzing (" + str(time.gmtime().tm_hour) + ":" + str(time.gmtime().tm_min) + ":" + str(
         time.gmtime().tm_sec) + ")")
 	# Retrieving the last 1000 tweets for each tag and appends them into a list
@@ -98,11 +126,20 @@ def check():
 						continue
 
 					try:
+						# FULL URL
+						print(colors.OKGREEN + 'https://twitter.com/{}/status/{}'.format(tweet["user"]["screen_name"], tweet["id"]))
+						# Checked tweets
+						checked += 1
+						print(colors.OKCYAN + "Checked tweets: " + str(checked))
 						# RETWEET
 						# This is ran under a try clause because there's always an error when trying to retweet something
                         # already retweeted. So if that's the case, the except is called and we skip this tweet
                         # If the tweet wasn't retweeted before, we retweet it and check for other stuff
 						api.retweet(id=tweet["id"])
+						# Joined tweets
+						joined += 1
+						print(colors.OKMAGENTA + "Joined tweets: " + str(joined))
+
 						print(colors.OKBLUE + "Retweeted " + str(tweet["id"]))
 						just_retweet_streak += 1
 
@@ -117,12 +154,21 @@ def check():
 
 						# LIKE
 						try:
-							# So we don't skip the tweet if we get the "You have already favorited this status." error
 							if any(x in tweet["full_text"].lower() for x in config.like_tags):
-								# If the tweets contains any like_tags, it automatically likes the tweet
-								api.create_favorite(id=tweet["id"])
-								print("Liked: " + str(tweet["id"]))
-								just_retweet_streak = 0
+								driver = webdriver.Chrome(service=s, options=options)
+								driver.get('https://twitter.com/{}/status/{}'.format(tweet["user"]["screen_name"], tweet["id"]))
+								try:
+									element = WebDriverWait(driver, 5).until(
+										EC.presence_of_element_located((By.CSS_SELECTOR, '.r-4qtqp9.r-yyyyoo.r-50lct3.r-dnmrzs.r-bnwqim.r-1plcrui.r-lrvibr.r-1srniue'))
+									)
+									like = driver.find_elements(By.CSS_SELECTOR, ".r-4qtqp9.r-yyyyoo.r-50lct3.r-dnmrzs.r-bnwqim.r-1plcrui.r-lrvibr.r-1srniue")
+									like[2].click()
+									driver.close()
+									print("Liked: " + str(tweet["id"]))
+									just_retweet_streak = 0
+								except TimeoutException:
+									print("page didn't load in time")
+									driver.close()
 						except:
 							pass	
 
@@ -136,7 +182,7 @@ def check():
 							friends_count = api.get_user(screen_name=screen_name)._json["friends_count"]
 							
 							if tweet["user"]["screen_name"] not in friends:
-								print("Followed: @" + tweet["user"]["screen_name"])
+								print(colors.OKBLUE + "Followed: @" + tweet["user"]["screen_name"])
 								api.create_friendship(screen_name=tweet["user"]["screen_name"])
 								addFriends.append(tweet["user"]["screen_name"])
 								just_retweet_streak = 0
